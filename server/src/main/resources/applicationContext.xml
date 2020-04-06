@@ -34,9 +34,12 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/user/login/by_email"/>
             <mvc:exclude-mapping path="/index.html"/>
             <mvc:exclude-mapping path="/login.html"/>
+            <mvc:exclude-mapping path="/image/get/*"/>
+            <mvc:exclude-mapping path="/error"/>
+            <mvc:exclude-mapping path="/user/create"/>
             <bean class="cn.yuheng.server.interceptor.LoginInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

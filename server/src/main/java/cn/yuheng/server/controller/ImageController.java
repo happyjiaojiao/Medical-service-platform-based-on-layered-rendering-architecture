@@ -20,7 +20,7 @@ public class ImageController {
     @Autowired
     ImageDao imageDao;
 
-    @GetMapping("/image/{id}.jpeg")
+    @GetMapping("/image/get/{id}.jpeg")
     public void getImage(@PathVariable("id") int id, HttpServletResponse response) throws IOException {
         Image image = imageDao.selectByPrimaryKey(id);
         if (image == null) {

@@ -32,21 +32,23 @@ public class UserController {
         this.userDao = userDao;
     }
 
-    @RequestMapping(value = "/getUser", method = RequestMethod.GET)
-    public User getUser(@RequestParam("id") Integer id) {
-        return userDao.selectByID(id);
+    //测试专用
+    @RequestMapping(value = "/user/get", method = RequestMethod.GET)
+    public Map<String, String> getUser(@RequestParam("id") Integer id) {
+        User user = userDao.selectByID(id);
+        return ResponseUtil.responseSuccessOrNot(true);
     }
 
-    @RequestMapping(value = "/createUser", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/create", method = RequestMethod.POST)
     public Map<String, String> createUser(@RequestParam("email") String email, @RequestParam("password") String password) {
         User user = new User();
         user.setEmail(email);
         user.setPassword(password);
         int statusCode = userDao.insertSelective(user);
-        return ResponseUtil.responseSuccessOrNot(statusCode == 0);
+        return ResponseUtil.responseSuccessOrNot(statusCode > 0);
     }
 
-    @RequestMapping(value = "/loginEmail", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/login/by_email", method = RequestMethod.POST)
     public User login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password, Long time) {
         User user = userDao.selectByEmail(email);
         if (PasswordUtil.checkPassword(password, time, user.getPassword())) {
@@ -57,7 +59,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/logout", method = RequestMethod.POST)
     public void logout(HttpSession session) {
         session.removeAttribute("user");
     }
