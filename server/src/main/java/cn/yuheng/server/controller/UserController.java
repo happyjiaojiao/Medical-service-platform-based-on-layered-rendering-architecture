@@ -32,7 +32,7 @@ public class UserController {
         this.userDao = userDao;
     }
 
-    @RequestMapping(value = "/getUser", method = RequestMethod.POST)
+    @RequestMapping(value = "/getUser", method = RequestMethod.GET)
     public User getUser(@RequestParam("id") Integer id) {
         return userDao.selectByID(id);
     }
