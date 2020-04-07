@@ -32,13 +32,27 @@ public class UserController {
         this.userDao = userDao;
     }
 
-    //测试专用
+    /**
+     * URI: /user/get
+     * 参数：id
+     * 返回（JSON）User
+     * 例如{"id":1,"name":"test1测试","sex":"male","email":"'test@test.test'","wechatId":null,
+     * "headPortraitId":null,"password":null,"registrationTime":"2020-04-06T18:38:09.000+0000","phone":"1","type":null,"status":null}
+     * 测试专用
+     */
     @RequestMapping(value = "/user/get", method = RequestMethod.GET)
-    public Map<String, String> getUser(@RequestParam("id") Integer id) {
+    public User getUser(@RequestParam("id") Integer id) {
         User user = userDao.selectByID(id);
-        return ResponseUtil.responseSuccessOrNot(true);
+        return user;
     }
 
+    /**
+     * URI /user/creat
+     *
+     * @param email
+     * @param password MD5Hex(password+password[0:6])
+     * @return {"result":"success"}或{"result":"fail"}
+     */
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
     public Map<String, String> createUser(@RequestParam("email") String email, @RequestParam("password") String password) {
         User user = new User();
@@ -48,6 +62,13 @@ public class UserController {
         return ResponseUtil.responseSuccessOrNot(statusCode > 0);
     }
 
+    /**
+     * @param session
+     * @param email
+     * @param password MD5Hex(MD5Hex(password+password[0:6]))+long(time))
+     * @param time
+     * @return
+     */
     @RequestMapping(value = "/user/login/by_email", method = RequestMethod.POST)
     public User login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password, Long time) {
         User user = userDao.selectByEmail(email);

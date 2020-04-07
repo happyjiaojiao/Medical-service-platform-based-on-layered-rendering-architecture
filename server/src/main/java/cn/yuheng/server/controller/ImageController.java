@@ -20,6 +20,11 @@ public class ImageController {
     @Autowired
     ImageDao imageDao;
 
+    /**
+     * @param id       图片ID
+     * @param response
+     * @throws IOException
+     */
     @GetMapping("/image/get/{id}.jpeg")
     public void getImage(@PathVariable("id") int id, HttpServletResponse response) throws IOException {
         Image image = imageDao.selectByPrimaryKey(id);
