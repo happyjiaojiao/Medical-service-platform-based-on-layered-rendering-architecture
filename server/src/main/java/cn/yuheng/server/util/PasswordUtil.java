@@ -9,8 +9,8 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class PasswordUtil {
     public static boolean checkPassword(String userPostPassword, long time, String databasePostedPassword) {
-        //比对的密码格式(小端序)：MD5Hex(MD5Hex(Hex(password+"yuheng"))+long(time))
-        //数据库密码字段：MD5(Hex(password+"yuheng"))
+        //比对的密码格式(小端序)：MD5Hex(MD5Hex(password+password[0:6]))+long(time))
+        //数据库密码字段：MD5(password+password[0:6]))
         if (Math.abs(time - System.currentTimeMillis()) >= 60000) {
             return false;
         }
