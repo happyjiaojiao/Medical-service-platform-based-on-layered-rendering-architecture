@@ -5,9 +5,13 @@ import cn.yuheng.server.server.LoginHistoryServer;
 import cn.yuheng.server.server.UserServer;
 import cn.yuheng.server.util.PasswordUtil;
 import cn.yuheng.server.util.Result;
+import com.google.code.kaptcha.Constants;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -29,23 +33,27 @@ public class UserController {
     private LoginHistoryServer loginHistoryServer;
 
     @GetMapping(value = "/api/user/get")
-    public Result<User> getUser(@RequestParam("id") Integer id) {
+    public Result<User> getUser(Integer id) {
         User user = userServer.getByID(id);
         return Result.successOrFail(user);
     }
 
     @GetMapping(value = "/api/user/get/by-email")
-    public Result<User> getUserByEmail(@RequestParam("email") String email) {
+    public Result<User> getUserByEmail(String email) {
         User user = userServer.getByEmail(email);
         return Result.successOrFail(user);
     }
 
     @PostMapping(value = "/api/user/create/by-email")
-    public Result createUser(@RequestBody Map<String, String> userJson) {
+    public Result createUser(HttpSession session, @RequestBody Map<String, String> userJson) {
         String email = userJson.get("email");
         String password = userJson.get("password");
+        String captcha = userJson.get("captcha");
         if (email == null || password == null) {
             return Result.fail(null, "参数错误");
+        }
+        if (captcha != session.getAttribute(Constants.KAPTCHA_SESSION_KEY)) {
+            return Result.fail(null, "验证码错误");
         }
         User user = new User();
         user.setEmail(email);
@@ -57,7 +65,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/api/user/login/by-email")
-    public Result<User> login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password, Long time) {
+    public Result<User> login(HttpSession session, String email, String password, Long time) {
         User user = userServer.getByEmail(email);
         if (user == null) {
             return Result.fail();
