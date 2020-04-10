@@ -8,10 +8,10 @@ import org.springframework.context.annotation.ImportResource;
 @ImportResource(locations = {"classpath:applicationContext.xml"})
 public class ServerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ServerApplication.class, args);
+    public static void main(String[] args) {
+        SpringApplication.run(ServerApplication.class, args);
 //		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:/applicationContext.xml");
 //		context.
-	}
+    }
 
 }

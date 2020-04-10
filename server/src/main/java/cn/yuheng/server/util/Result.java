@@ -31,6 +31,11 @@ public class Result<T> {
         this.data = new Data(message, entity);
     }
 
+    public Result(int code, Data data) {
+        this.code = code;
+        this.data = data;
+    }
+
     public Result(int code, T entity) {
         this.code = code;
         String message;
@@ -57,11 +62,11 @@ public class Result<T> {
     }
 
     public static <K> Result<K> success() {
-        return new Result<>(200, Data.SUCCESS_MESSAGE, null);
+        return SUCCESS_RESULT;
     }
 
-    public static <K> Result<K> fail(K entity) {
-        return new Result<>(500, Data.Fail_MESSAGE, entity);
+    public static <K> Result<K> fail(String message) {
+        return new Result<>(500, message, null);
     }
 
     public static <K> Result<K> fail(K entity, String message) {
@@ -69,21 +74,27 @@ public class Result<T> {
     }
 
     public static <K> Result<K> fail() {
-        return new Result<>(500, Data.Fail_MESSAGE, null);
+        return FAIL_RESULT;
     }
 
     public static Result<Object> successOrFail(boolean success) {
-        return success ? success(null) : fail(null);
+        return success ? SUCCESS_RESULT : FAIL_RESULT;
     }
 
     public static <E> Result<E> successOrFail(E entity) {
-        return entity != null ? success(entity) : fail(null);
+        return entity != null ? success(entity) : FAIL_RESULT;
     }
 
     public static final int SUCCESS_CODE = 200;
     public static final int FAIL_CODE = 500;
     public static final int NOT_LOGGED_IN_CODE = 401;
     public static final int UNAUTHORIZED_CODE = 406;
+
+    public static final Data SUCCESS_DATA = new Data(Data.SUCCESS_MESSAGE, null);
+    public static final Data FAIL_DATA = new Data(Data.Fail_MESSAGE, null);
+
+    public static final Result SUCCESS_RESULT = new Result(SUCCESS_CODE, SUCCESS_DATA);
+    public static final Result FAIL_RESULT = new Result(FAIL_CODE, FAIL_DATA);
 
     private int code;
     private Data data;
