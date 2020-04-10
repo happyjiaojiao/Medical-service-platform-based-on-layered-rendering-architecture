@@ -3,12 +3,9 @@ package cn.yuheng.server.controller;
 import cn.yuheng.server.dao.UserDao;
 import cn.yuheng.server.pojo.User;
 import cn.yuheng.server.util.PasswordUtil;
-import cn.yuheng.server.util.ResponseUtil;
+import cn.yuheng.server.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -35,31 +32,32 @@ public class UserController {
     /**
      * URI: /user/get
      * 参数：id
-     * 返回（JSON）User
-     * 例如{"id":1,"name":"test1测试","sex":"male","email":"'test@test.test'","wechatId":null,
-     * "headPortraitId":null,"password":null,"registrationTime":"2020-04-06T18:38:09.000+0000","phone":"1","type":null,"status":null}
      * 测试专用
      */
-    @RequestMapping(value = "/user/get", method = RequestMethod.GET)
-    public User getUser(@RequestParam("id") Integer id) {
+    @RequestMapping(value = "/api/user/get", method = RequestMethod.GET)
+    public Result<User> getUser(@RequestParam("id") Integer id) {
         User user = userDao.selectByID(id);
-        return user;
+        return Result.successOrFail(user);
     }
 
     /**
      * URI /user/creat
-     *
-     * @param email
-     * @param password MD5Hex(password+password[0:6])
-     * @return {"result":"success"}或{"result":"fail"}
      */
-    @RequestMapping(value = "/user/create", method = RequestMethod.POST)
-    public Map<String, String> createUser(@RequestParam("email") String email, @RequestParam("password") String password) {
+    @PostMapping(value = "/api/user/create/by-email")
+    public Result createUser(@RequestBody Map<String, String> userJson) {
+        String email = userJson.get("email");
+        String password = userJson.get("password");
+        if (email == null || password == null) {
+            return Result.fail(null, "参数错误");
+        }
         User user = new User();
         user.setEmail(email);
         user.setPassword(password);
+        if (null != userDao.selectByEmail(user.getEmail())) {
+            return Result.fail(null, "邮箱账号已被注册");
+        }
         int statusCode = userDao.insertSelective(user);
-        return ResponseUtil.responseSuccessOrNot(statusCode > 0);
+        return Result.successOrFail(statusCode == 1);
     }
 
     /**
@@ -69,19 +67,23 @@ public class UserController {
      * @param time
      * @return
      */
-    @RequestMapping(value = "/user/login/by_email", method = RequestMethod.POST)
-    public User login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password, Long time) {
+    @RequestMapping(value = "/api/user/login/by-email", method = RequestMethod.POST)
+    public Result<User> login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password, Long time) {
         User user = userDao.selectByEmail(email);
+        if (user == null) {
+            return Result.fail();
+        }
         if (PasswordUtil.checkPassword(password, time, user.getPassword())) {
             session.setAttribute("user", user);
-            return user;
+            return Result.success(user);
         } else {
-            return null;
+            return Result.fail();
         }
     }
 
-    @RequestMapping(value = "/user/logout", method = RequestMethod.POST)
-    public void logout(HttpSession session) {
+    @RequestMapping(value = "/api/user/logout", method = RequestMethod.POST)
+    public Result logout(HttpSession session) {
         session.removeAttribute("user");
+        return Result.success();
     }
 }
