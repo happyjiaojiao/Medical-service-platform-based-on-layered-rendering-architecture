@@ -1,6 +1,7 @@
 package cn.yuheng.server.controller;
 
 import cn.yuheng.server.pojo.User;
+import cn.yuheng.server.server.LoginHistoryServer;
 import cn.yuheng.server.server.UserServer;
 import cn.yuheng.server.util.PasswordUtil;
 import cn.yuheng.server.util.Result;
@@ -23,20 +24,22 @@ public class UserController {
     @Setter
     private UserServer userServer;
 
-    /**
-     * URI: /user/get
-     * 参数：id
-     * 测试专用
-     */
-    @RequestMapping(value = "/api/user/get", method = RequestMethod.GET)
+    @Autowired
+    @Setter
+    private LoginHistoryServer loginHistoryServer;
+
+    @GetMapping(value = "/api/user/get")
     public Result<User> getUser(@RequestParam("id") Integer id) {
         User user = userServer.getByID(id);
         return Result.successOrFail(user);
     }
 
-    /**
-     * URI /user/creat
-     */
+    @GetMapping(value = "/api/user/get/by-email")
+    public Result<User> getUserByEmail(@RequestParam("email") String email) {
+        User user = userServer.getByEmail(email);
+        return Result.successOrFail(user);
+    }
+
     @PostMapping(value = "/api/user/create/by-email")
     public Result createUser(@RequestBody Map<String, String> userJson) {
         String email = userJson.get("email");
@@ -53,29 +56,30 @@ public class UserController {
         return Result.successOrFail(userServer.addUser(user));
     }
 
-    /**
-     * @param session
-     * @param email
-     * @param password MD5Hex(MD5Hex(password+password[0:6]))+long(time))
-     * @param time
-     * @return
-     */
-    @RequestMapping(value = "/api/user/login/by-email", method = RequestMethod.POST)
+    @PostMapping(value = "/api/user/login/by-email")
     public Result<User> login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password, Long time) {
         User user = userServer.getByEmail(email);
         if (user == null) {
             return Result.fail();
         }
         if (PasswordUtil.checkPassword(password, time, user.getPassword())) {
-            session.setAttribute("user", user);
+            login(session, user);
             return Result.success(user);
         } else {
             return Result.fail();
         }
     }
 
-    @RequestMapping(value = "/api/user/logout", method = RequestMethod.POST)
+    public void login(HttpSession session, User user) {
+        session.setAttribute("user", user);
+        loginHistoryServer.addLoginHistory(user.getId());
+    }
+
+    @PostMapping(value = "/api/user/logout")
     public Result logout(HttpSession session) {
+        if (session.getAttribute("user") == null) {
+            return Result.fail(null, "未登录");
+        }
         session.removeAttribute("user");
         return Result.success();
     }
