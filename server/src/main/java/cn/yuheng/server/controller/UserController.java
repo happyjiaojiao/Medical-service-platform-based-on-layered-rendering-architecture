@@ -1,9 +1,10 @@
 package cn.yuheng.server.controller;
 
-import cn.yuheng.server.dao.UserDao;
 import cn.yuheng.server.pojo.User;
+import cn.yuheng.server.server.UserServer;
 import cn.yuheng.server.util.PasswordUtil;
 import cn.yuheng.server.util.Result;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +20,8 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private UserDao userDao;
-
-    public UserDao getUserDao() {
-        return userDao;
-    }
-
-    public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
-    }
+    @Setter
+    private UserServer userServer;
 
     /**
      * URI: /user/get
@@ -36,7 +30,7 @@ public class UserController {
      */
     @RequestMapping(value = "/api/user/get", method = RequestMethod.GET)
     public Result<User> getUser(@RequestParam("id") Integer id) {
-        User user = userDao.selectByID(id);
+        User user = userServer.getByID(id);
         return Result.successOrFail(user);
     }
 
@@ -53,11 +47,10 @@ public class UserController {
         User user = new User();
         user.setEmail(email);
         user.setPassword(password);
-        if (null != userDao.selectByEmail(user.getEmail())) {
+        if (null != userServer.getByEmail(email)) {
             return Result.fail(null, "邮箱账号已被注册");
         }
-        int statusCode = userDao.insertSelective(user);
-        return Result.successOrFail(statusCode == 1);
+        return Result.successOrFail(userServer.addUser(user));
     }
 
     /**
@@ -69,7 +62,7 @@ public class UserController {
      */
     @RequestMapping(value = "/api/user/login/by-email", method = RequestMethod.POST)
     public Result<User> login(HttpSession session, @RequestParam("email") String email, @RequestParam("password") String password, Long time) {
-        User user = userDao.selectByEmail(email);
+        User user = userServer.getByEmail(email);
         if (user == null) {
             return Result.fail();
         }
