@@ -1,8 +1,8 @@
 package cn.yuheng.server.controller;
 
 import cn.yuheng.server.pojo.User;
-import cn.yuheng.server.server.MailService;
-import cn.yuheng.server.server.UserServer;
+import cn.yuheng.server.service.MailService;
+import cn.yuheng.server.service.UserService;
 import cn.yuheng.server.util.Result;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +23,14 @@ public class MailController {
 
     @Autowired
     @Setter
-    private UserServer userServer;
+    private UserService userService;
 
     @Autowired
     private MailService mailService;
 
     @PostMapping("getCheckCode")
     public Result getCheckCode(HttpSession session, String email) {
-        User user = userServer.getByEmail(email);
+        User user = userService.getByEmail(email);
         if (user == null) {
             return Result.fail("用户不存在");
         }

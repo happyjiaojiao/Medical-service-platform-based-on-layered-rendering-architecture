@@ -1,4 +1,4 @@
-package cn.yuheng.server.server;
+package cn.yuheng.server.service;
 
 import cn.yuheng.server.dao.LoginHistoryDao;
 import cn.yuheng.server.pojo.LoginHistory;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @date 2020/4/10 下午2:30
  */
 @Service
-public class LoginHistoryServer {
+public class LoginService {
     @Setter
     @Autowired
     private LoginHistoryDao loginHistoryDao;

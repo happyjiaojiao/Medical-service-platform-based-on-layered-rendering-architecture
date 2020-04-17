@@ -1,4 +1,4 @@
-package cn.yuheng.server.server;
+package cn.yuheng.server.service;
 
 import cn.yuheng.server.dao.ImageDao;
 import cn.yuheng.server.pojo.Image;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @date 2020/4/10 上午9:10
  */
 @Service
-public class ImageServer {
+public class ImageService {
     @Autowired
     @Setter
     private ImageDao imageDao;

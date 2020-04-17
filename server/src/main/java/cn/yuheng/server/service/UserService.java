@@ -1,4 +1,4 @@
-package cn.yuheng.server.server;
+package cn.yuheng.server.service;
 
 import cn.yuheng.server.dao.UserDao;
 import cn.yuheng.server.pojo.User;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @date 2020/4/10 上午8:56
  */
 @Service
-public class UserServer {
+public class UserService {
     @Autowired
     @Setter
     private UserDao userDao;

@@ -1,7 +1,7 @@
 package cn.yuheng.server.controller;
 
 import cn.yuheng.server.pojo.Image;
-import cn.yuheng.server.server.ImageServer;
+import cn.yuheng.server.service.ImageService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import java.io.IOException;
 public class ImageController {
     @Autowired
     @Setter
-    private ImageServer imageServer;
+    private ImageService imageService;
 
     /**
      * @param id       图片ID
@@ -29,7 +29,7 @@ public class ImageController {
      */
     @GetMapping("/image/get/{id}.jpeg")
     public void getImage(@PathVariable("id") int id, HttpServletResponse response) throws IOException {
-        Image image = imageServer.getByID(id);
+        Image image = imageService.getByID(id);
         if (image == null) {
             response.setStatus(404);
         } else {

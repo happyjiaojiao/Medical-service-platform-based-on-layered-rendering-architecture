@@ -1,5 +1,6 @@
 package cn.yuheng.server.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -24,6 +25,7 @@ public class User implements Serializable {
 
     private Integer headPortraitId;
 
+    @JsonIgnore
     private String password;
 
     private Date registrationTime;
